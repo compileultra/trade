@@ -90,97 +90,6 @@ company_index = list(file2.keys())[:]
 
 from talib import abstract
 
-
-# In[23]:
-
-
-pd.read_excel(company_index[0]+".xlsx")
-
-
-# In[24]:
-
-
-df = pd.read_excel(company_index[0]+".xlsx")
-
-
-# In[25]:
-
-
-inputs = {
-    'open': df["open"],
-    'high': df["high"],
-    'low':  df["low"],
-    'close': df["close"],
-    'volume': df["volume"]
-}
-# uses close prices (default)
-out5ma = abstract.SMA(inputs, timeperiod=5)
-out10ma = abstract.SMA(inputs, timeperiod=10)
-out20ma = abstract.SMA(inputs, timeperiod=20)
-out60ma = abstract.SMA(inputs, timeperiod=60)
-out120ma = abstract.SMA(inputs, timeperiod=120)
-outRSI = abstract.RSI(inputs,timeperiod=14)
-outADX=abstract.ADX(inputs, timperiod = 14)
-outema=abstract.EMA(inputs, timeperiod=30)
-outMACD=abstract.MACD(inputs, fastperiod=12, slowperiod=26, signalperiod=9)
-#MACD,MACDsignal,MACDhist
-outMACDFix=abstract.MACDFIX(inputs,signalperiod=9)
-#outKD=abstract.STOCH(inputs, 5, 3, 0, 3, 0,prices=['high', 'low', 'open'])
-outKD=abstract.STOCH(inputs, 5, 3, 0, 3, 0,prices=['high', 'low', 'open'])
-
-
-# In[26]:
-
-
-#print(abstract.MACD)
-#print(abstract.RSI)
-
-
-# In[27]:
-
-
-#pd.DataFrame(outMACDFix,columns=["MACDFix"]).head(100)
-
-
-# In[28]:
-
-
-#pd.DataFrame(outMACD,columns=["MACD","MACDsignal","MACDhist"]).head(100)
-
-
-# In[29]:
-
-
-pd.DataFrame(outADX,columns=["ADX"]).head(100)
-
-
-# In[30]:
-
-
-pd.DataFrame(outRSI,columns=["RSI"]).head(100)
-
-
-# In[31]:
-
-
-#pd.DataFrame(outKD,columns=["KD"]).head(100)
-
-
-# In[32]:
-
-
-out20ma
-
-
-# In[33]:
-
-
-pd.concat([ df,pd.DataFrame(out5ma, columns=["5MA"]),pd.DataFrame(out10ma, columns=["10MA"]),pd.DataFrame(out20ma, columns=["20MA"])          , pd.DataFrame(out60ma, columns=["60MA"]), pd.DataFrame(out120ma, columns=["120MA"]),pd.DataFrame(outRSI, columns=["RSI"]),pd.DataFrame(outADX, columns=["ADX"]),pd.DataFrame(outema, columns=["EMA"])] ,axis=1).head(140)
-
-
-# In[34]:
-
-
 for w in range(0, len(company_index)):
     df = pd.read_excel(company_index[w]+".xlsx")
     inputs = {
@@ -191,48 +100,36 @@ for w in range(0, len(company_index)):
     'volume': df["volume"]
     }
     # uses close prices (default)
-    out5ma = abstract.SMA(inputs, timeperiod=5)
-    out10ma = abstract.SMA(inputs, timeperiod=10)
-    out20ma = abstract.SMA(inputs, timeperiod=20)
-    out60ma = abstract.SMA(inputs, timeperiod=60)
+    out5ma   = abstract.SMA(inputs, timeperiod=5)
+    out10ma  = abstract.SMA(inputs, timeperiod=10)
+    out20ma  = abstract.SMA(inputs, timeperiod=20)
+    out60ma  = abstract.SMA(inputs, timeperiod=60)
     out120ma = abstract.SMA(inputs, timeperiod=120)
-    outRSI = abstract.RSI(inputs,timeperiod=14)
-    outADX=abstract.ADX(inputs, timperiod = 14)
-    outema=abstract.EMA(inputs, timeperiod=30)
-    a =  pd.DataFrame(out5ma, columns=["5MA"])
+    outRSI   = abstract.RSI(inputs,timeperiod=14)
+    outADX   = abstract.ADX(inputs, timperiod = 14)
+    outema   = abstract.EMA(inputs, timeperiod=30)
+    outMACD  = abstract.MACD(inputs, fastperiod=12, slowperiod=26, signalperiod=9)
+    #MACD,MACDsignal,MACDhist
+    outMACDFix=abstract.MACDFIX(inputs,signalperiod=9)
+    #outKD=abstract.STOCH(inputs, 5, 3, 0, 3, 0,prices=['high', 'low', 'open'])
+    outKD    = abstract.STOCH(inputs, 5, 3, 0, 3, 0,prices=['high', 'low', 'open'])
+    a = pd.DataFrame(out5ma, columns=["5MA"])
     b = pd.DataFrame(out60ma, columns=["10MA"])
     c = pd.DataFrame(out120ma, columns=["20MA"])
-    d =  pd.DataFrame(out20ma, columns=["60MA"])
-    e =  pd.DataFrame(out20ma, columns=["120MA"])
-    f =  pd.DataFrame(outRSI, columns=["RSI"])
-    g =  pd.DataFrame(outADX, columns=["ADX"])
-    h =  pd.DataFrame(outema, columns=["EMA"])
-    pd.concat([df,a , b, c,d,e,f,g,h], axis=1).to_excel(company_index[w]+".xlsx",sheet_name = company_index[w], index=False)
+    d = pd.DataFrame(out20ma, columns=["60MA"])
+    e = pd.DataFrame(out20ma, columns=["120MA"])
+    f = pd.DataFrame(outRSI, columns=["RSI"])
+    g = pd.DataFrame(outADX, columns=["ADX"])
+    h = pd.DataFrame(outema, columns=["EMA"])
+    i = pd.DataFrame(map(list, zip(*outMACD)),columns=["MACD","MACDsignal","MACDhist"])
+    j = pd.DataFrame(map(list, zip(*outKD)),columns=["slowK","slowD"])
+    pd.concat([df,a,b,c,d,e,f,g,h,i,j], axis=1).to_excel(company_index[w]+".xlsx",sheet_name = company_index[w], index=False)
     if(w%100==0):
         print(w)
 
-
-# In[36]:
-
-
+# Prepare train data
 train_set = pd.read_excel("strategy_results_train.xlsx")
-
-
-# In[37]:
-
-
-import copy
-
-
-# In[38]:
-
-
 dataset = copy.deepcopy(train_set)
-
-
-# In[39]:
-
-
 temp = []
 for i in range(0, dataset.shape[0]):
 #for i in range(0, 60):
@@ -249,32 +146,12 @@ for i in range(0, dataset.shape[0]):
             lower_index = index
         else:
             break
-#   print(list(df.iloc[lower_index, :]))
-    #print('Running ',i)
-    #print(trade_company)
-    #print(trade_date)
-    #print(trade_date_datetime)
-    #print(lower_index)
-    #print(list(df.iloc[lower_index, :]))
     temp.append(list(df.iloc[lower_index, :]))
 pd.DataFrame(temp).to_excel("train_output.xlsx", index=False)
 
 
-# In[41]:
-
-
+# Prepare test dataset
 testset = pd.read_excel("sampleSubmission.xlsx")
-
-
-# In[42]:
-
-
-testset.head()
-
-
-# In[43]:
-
-
 temp = []
 for i in range(1, testset.shape[0]):
 # for i in range(0, 10):
@@ -290,29 +167,10 @@ for i in range(1, testset.shape[0]):
             lower_index = index
         else:
             break
-#     print(list(df.iloc[lower_index, :]))
     if(lower_index==0):
         temp.append(dash = ["-","","","","","","","",""])
     else:
         temp.append(list(df.iloc[lower_index, :]))
-temp[0]
 pd.DataFrame(temp).to_excel("test_output.xlsx", index=False)
-
-
-# In[ ]:
-
-
 pd.DataFrame(temp).to_csv("test_output.csv", index=False)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
