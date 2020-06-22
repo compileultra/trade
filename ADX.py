@@ -30,6 +30,8 @@ for i in range(0, len(stock1_index)):
     if(stock1_index[i] not in companies):
         print('Number of stocks in 2014-2018 but not in current run: ',stock1_index[i])
 
+
+# Find companies after 2018
 rest_comy = []
 for i in range(0, len(stock2_index)):
     if(stock2_index[i] not in stock1_index):
@@ -37,6 +39,7 @@ for i in range(0, len(stock2_index)):
         rest_comy.append(stock2_index[i])
 print(len(rest_comy))
 
+# Write out excels for companies after 2018
 result_name = []
 result_sheet = []
 
@@ -48,6 +51,7 @@ for w in range(0, len(result_sheet)):
     result_sheet[w].to_excel(result_name[w]+".xlsx", sheet_name = result_name[w], index=False)
     print(w, result_name[w])
 
+# Concatenate company files if it has for 2014-2018
 result_name = []
 result_sheet = []
 # column mismatch at sheet 0
@@ -65,31 +69,19 @@ for i in range(1, len(stock1_index)):
     #print('this is b',i)
     #print(b)
     result_sheet.append( pd.concat([a, b]) )
-
-
-
 print(len(result_name))
 print(len(result_sheet))
-
 
 for w in range(0, len(result_sheet)):
     result_sheet[w].to_excel(result_name[w]+".xlsx", sheet_name = result_name[w], index=False)
     if(w%100==0):
         print(w,result_name[w])
 
-
-# In[21]:
-
-
+# Set company index to post-2018 since it includes all 800 companies
 company_index = []
 company_index = list(file2.keys())[:]
 
-
-# In[22]:
-
-
 from talib import abstract
-
 for w in range(0, len(company_index)):
     df = pd.read_excel(company_index[w]+".xlsx")
     inputs = {
